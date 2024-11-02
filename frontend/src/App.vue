@@ -1,20 +1,15 @@
 <template>
   <div class="nav-bar">
     <div class="nav-items">
-      <a href="#/practice">Practice</a>
-      <a href="#/race">Race</a>
+      <a class="nav-item" :class="{ 'selected': selectedPage == '/practice' }" href="#/practice"
+        @click="selectNav('/practice')">Practice</a>
+      <a class="nav-item" :class="{ 'selected': selectedPage == '/race' }" href="#/race"
+        @click="selectNav('/race')">Race</a>
     </div>
   </div>
-  
+
   <div class="main-body">
     <component :is="currentView"></component>
-    <div class="left-menu">
-
-    </div>
-
-    <div class="main-content">
-
-    </div>
   </div>
 </template>
 
@@ -24,6 +19,10 @@ import { ref, computed } from 'vue';
 import PracticeView from './pages/PracticeView.vue';
 import RaceView from './pages/RaceView.vue';
 
+const selectedPage = ref('/practice');
+const selectNav = (selectedNav) => {
+  selectedPage.value = selectedNav;
+}
 
 const routes = {
   '/practice': PracticeView,
@@ -43,24 +42,28 @@ const currentView = computed(() => {
 </script>
 
 <style scoped>
-  .nav-bar {
-    width: 100%;
-    height: 5rem;
-  }
+.nav-bar {
+  width: 100%;
+  height: 5rem;
+}
 
-  .main-body {
-    height: calc(100vh - 5rem);
-    display: flex;
-  }
+.nav-items {
+  padding: 2rem 3rem;
+}
 
-  .left-menu {
-    width: 30rem;
-    height: 100%;
-  }
+.nav-item {
+  color: aliceblue;
+  font-size: 2rem;
+  padding: 2rem;
+  text-decoration: none;
+}
 
-  .main-content {
-    height: 100%;
-    width: 100vw;
-  }
+.selected {
+  color: #00D0F4;
+}
 
+.main-body {
+  height: calc(100vh - 5rem);
+  display: flex;
+}
 </style>

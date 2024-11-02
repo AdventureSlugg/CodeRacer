@@ -1,0 +1,27 @@
+<template>
+	<div class="left-menu">
+		<slot name="left-menu"></slot>
+	</div>
+
+	<div class="main-content">
+		<slot name="main-content"></slot>
+	</div>
+</template>
+
+<script setup>
+
+</script>
+
+<style scoped>
+.left-menu {
+	width: 30rem;
+	height: 100%;
+	background-color: aliceblue;
+}
+
+.main-content {
+	height: 100%;
+	width: 100vw;
+	background-color: azure;
+}
+</style>
