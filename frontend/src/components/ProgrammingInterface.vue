@@ -23,7 +23,7 @@
 
 		<div>
 			<p id="solutionCodeOverlay"> {{ solutionCode }} </p>
-			<textarea id="codeContent" v-model="writtenCode" @input="updateStats()"></textarea>
+			<textarea id="codeContent" v-model="writtenCode" @input="updateStats()" @keydown="preventBackArrow"></textarea>
 			<p id="accuracyOverlay">
 				<span v-for="(char, index) in writtenCode" :key="index">
 					<span :class="{
@@ -42,7 +42,7 @@
 import { onMounted, onUnmounted, ref } from 'vue';
 
 const lines = ref([])
-const solutionCode = '// This is the solution'
+const solutionCode = '// This is the solution\n// is this still working'
 const writtenCode = ref('');
 
 // Status
@@ -113,6 +113,12 @@ const generateLineNumbers = () => {
 	lines.value = Array.from({length: lineCount}, (_, i) => i + 1)
 }
 
+const preventBackArrow = (event) => {
+	if (event.key === 'ArrowLeft') {
+		event.preventDefault();
+	}
+}
+
 onMounted( () => {
 	generateLineNumbers();
 })
@@ -147,7 +153,8 @@ onUnmounted( () => {
 		padding: 8px;
 		font-size: 22px;
 		font-family: 'Courier New', Courier, monospace;
-		border: none
+		border: none;
+		white-space: pre-wrap;
 	}
 
 	textarea:focus {
@@ -164,6 +171,7 @@ onUnmounted( () => {
 		position: absolute;
 		font-size: 22px;
 		font-family: 'Courier New', Courier, monospace;
+		white-space: pre-wrap;
 	}
 
 	#accuracyOverlay {
@@ -178,6 +186,7 @@ onUnmounted( () => {
 		font-family: 'Courier New', Courier, monospace;
 		border: none;
 		pointer-events: none;
+		white-space: pre-wrap;
 	}
 
 	.correct {
