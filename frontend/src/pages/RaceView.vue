@@ -17,18 +17,21 @@ const { io } = require("socket.io-client");
 
 const cio = io('http://127.0.0.1:3000/');
 let count = 0;
-let uid = 0; // this needs to be set sometime
+let scores = new Map();
+
 // client-side
 cio.on('connect', () => {
-	cio.on('assignUid', (who) => {
-		uid = who;
-		console.log('connected! you are ' + uid)
-	})
+	console.log('connected!');
 });
+
+cio.on('scores', (_scores) => {
+	scores = _scores;
+	console.log(scores)
+})
 
 function sendCount() {
 	count++;
-	cio.emit('wordcount', uid, count);
+	cio.emit('wordcount', count);
 	console.log('ahhhhhhhh');
 }
 

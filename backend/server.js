@@ -20,34 +20,35 @@ const io = require('socket.io')(server, {
 const hostname = '127.0.0.1';
 const port = 3000;
 
-let uid = 0;
-
 const scores = new Map();
 
 io.on('connection', (socket) => {
   console.log(socket.id);
-  socket.emit('assignUid', uid);
-  uid++;
-  scores.set(uid, 0);
+  scores.set(socket.id, 0);
 
   socket.on('start', () => {
-
+    // socket.removeAllListeners("scores"); // doesn't work, lol
   })
 
-  socket.on('wordcount', (uid, count) => {
-    console.log(uid, count);
-    scores.set(uid, count);
+  socket.on('wordcount', (count) => {
+    console.log(socket.id, count);
+    scores.set(socket.id, count);
+    let serializedScores = '';
+    scores.forEach((value, key) => {
+      serializedScores += '[' + key + ',' + value + ']';
+    });
+    socket.broadcast.emit('scores', serializedScores);
+    socket.emit('scores', serializedScores);
+
   })
 
   // // broadcast every 200 ms. maybe should be out of this connect
-  // socket.broadcast('scores', scores);
-});
+  // socket.broadcast.emit('scores', scores);
+    io.on('disconnect', (socket) => {
+      console.log(socket.id, 'has disconnected');
+    });
+  });
 
-
-io.on('disconnect', (socket) => {
-  socket.emit('damn, this guy left')
-  console.log(socket.id); // undefined
-});
 
 server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
