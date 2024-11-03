@@ -66,6 +66,11 @@ const updateStats = () => {
 	}
 	updateAccuracy();
 	calculateWPM();
+
+	// Stop the timer when the last character is correct
+	if (writtenCode.value.length >= solutionCode.length && writtenCode.value[writtenCode.value.length - 1] == solutionCode[solutionCode.length - 1]) {
+		clearInterval(timerInterval)
+	}
 }
 
 const calculateWPM = () => {
