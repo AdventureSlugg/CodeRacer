@@ -29,7 +29,7 @@
 			<div class="tracks">
 				<div class="track"><img src="../assets/duck1.png"></div>
 				<div class="track"><img src="../assets/duck1.png"></div>
-				<div class="track"><img src="../assets/duck1.png"></div>
+				<div class="track"><img src="../assets/duck2.png"></div>
 				<div class="track"><img src="../assets/duck1.png"></div>
 			</div>
 		</template>
@@ -38,18 +38,13 @@
 
 <script setup>
 import SplitContentRace from '@/layouts/SplitContentRace.vue';
-import { useTemplateRef } from 'vue'
 const { io } = require("socket.io-client");
 
 const cio = io('http://127.0.0.1:3000/');
 let count = 0; // number of words completed
-let totalWords = 100; // hard coded, oop
+// let totalWords = 100; // hard coded, oop
 let scores = new Map();
 
-let track = useTemplateRef('racetrack');
-console.log(totalWords, track.clientHeight)
-
-// client-side
 cio.on('connect', () => {
 	console.log('connected!');
 });
@@ -58,6 +53,7 @@ cio.on('scores', (_scores) => {
 	_scores.forEach(e => {
 		scores.set(e[0], e[1]);
 	});
+	console.log(scores);
 })
 
 function sendCount() {

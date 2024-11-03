@@ -40,14 +40,17 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('scores', arrayScores);
     socket.emit('scores', arrayScores);
 
-  })
+  });
+
+  socket.on('disconnect', () => {
+    scores.delete(socket.id);
+    console.log(socket.id, 'has disconnected');
+  });
+
+})
 
   // // broadcast every 200 ms. maybe should be out of this connect
   // socket.broadcast.emit('scores', scores);
-    io.on('disconnect', (socket) => {
-      console.log(socket.id, 'has disconnected');
-    });
-  });
 
 
 server.listen(port, hostname, () => {
