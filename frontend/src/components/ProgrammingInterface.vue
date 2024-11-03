@@ -59,6 +59,8 @@ let timerInterval;
 let incorrectChars = 0;
 let hasStarted = false;
 
+calculateCompletionPercent();
+
 const updateStats = () => {
 	if (hasStarted == false) {
 		hasStarted = true;
@@ -103,6 +105,10 @@ const updateAccuracy = () => {
 
 	formatTime();
 };
+
+const calculateCompletionPercent = () => {
+	return solutionCode.value.length ? ((writtenCode.value.length / solutionCode.value.length) * 100).toFixed(2) : 0;
+}
 
 const formatTime = () => {
 	const minutes = Math.floor(totalTimeInSeconds.value / 60).toString().padStart(2, '0');
