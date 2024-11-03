@@ -59,8 +59,6 @@ let timerInterval;
 let incorrectChars = 0;
 let hasStarted = false;
 
-calculateCompletionPercent();
-
 const updateStats = () => {
 	if (hasStarted == false) {
 		hasStarted = true;
@@ -128,6 +126,9 @@ const preventBackArrow = (event) => {
 		event.preventDefault();
 	}
 }
+
+calculateCompletionPercent();
+
 
 onMounted( () => {
 	generateLineNumbers();
