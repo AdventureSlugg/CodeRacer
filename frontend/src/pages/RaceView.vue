@@ -1,7 +1,6 @@
 <template>
 	<SplitContentRace>
 		<template #main-content>
-			hello
 			<button @click="sendCount">increaes word count</button>
 			<button @click="sendStartGame">Start Game</button>
 			<button @click="sendEndGame">End Game</button>
@@ -15,10 +14,9 @@
 						</p>
 					</div>
 				</div>
-				{{ scores }}
-				{{ messages }}
 				<div class="bottom-section">
-					<ProgrammingInterface></ProgrammingInterface>
+
+					<ProgrammingInterface ref='programmingInterfaceRef' codingChallenge='blah blah blah'></ProgrammingInterface>
 
 					<DifficultySelection></DifficultySelection>
 				</div>
@@ -27,14 +25,10 @@
 		<template #racetrack>
 			<div class="finish"></div>
 			<div class="tracks">
-				<!-- <div class="track"><img  src="../assets/duck1.png"></div>
-				<div class="track"><img src="../assets/duck1.png"></div>
-				<div class="track"><img  src="../assets/duck2.png"></div>
-				<div class="track"><img  src="../assets/duck1.png"></div> -->
-				<div class="track"><img :style="{bottom: d1dist}" src="../assets/duck1.png"></div>
-				<div class="track"><img :style="{bottom: d2dist}" src="../assets/duck1.png"></div>
-				<div class="track"><img :style="{bottom: d3dist}" src="../assets/duck2.png"></div>
-				<div class="track"><img :style="{bottom: d4dist}" src="../assets/duck1.png"></div>
+				<div class="track"><img :style="{bottom: ducks.get(user1)}" src="../assets/duck1.png"></div>
+				<div class="track"><img :style="{bottom: ducks.get(user2)}" src="../assets/duck1.png"></div>
+				<div class="track"><img :style="{bottom: ducks.get(user3)}" src="../assets/duck2.png"></div>
+				<div class="track"><img :style="{bottom: ducks.get(user4)}" src="../assets/duck1.png"></div>
 			</div>
 		</template>
 	</SplitContentRace>
@@ -47,52 +41,78 @@ import SplitContentRace from '@/layouts/SplitContentRace.vue';
 const { io } = require("socket.io-client");
 import { ref } from 'vue';
 
+const programmingInterfaceRef = ref(null);
+
+const getPercentComplete = () => {
+	if (programmingInterfaceRef.value) {
+		return programmingInterfaceRef.value.calculateCompletionPercent();
+	}
+	
+}
+
+// const trackLength =
+
 const cio = io('http://127.0.0.1:3000/');
 let percent = 0; // percent of words completed
 let scores = ref(new Map());
-let messages = ref('');
 
+let ducks = ref(new Map())//new Map(); // user, duckdist
 
-let ducks = new Map();
-let open = [3, 2, 1, 0];
-
-let d1dist = ref('0');
+let d1dist = ref('0')
 let d2dist = ref('0');
 let d3dist = ref('0');
 let d4dist = ref('0');
+
+let user1 = ref('');
+let user2 = ref('');
+let user3 = ref('');
+let user4 = ref('');
 
 let duckdists = [d1dist, d2dist, d3dist, d4dist];
 
 cio.on('connect', () => {
 	console.log('connected!');
-	ducks.set(cio.id, open.pop());
-
 });
 
-cio.on('users', (users) => {
-	users.forEach(e => {
-		ducks.set(e, open.pop());
-	})
-})
-
-cio.on('connected', (user) => {
-	ducks.set(user, open.pop());
-})
 
 cio.on('disconnected', (user) => {
-	open.push(ducks.get(user));
-	ducks.delete(user);
+	let duck = ducks.value.get(user);
+	duckdists.push(duck);
+	ducks.value.delete(user);
 })
 
 cio.on('scores', (_scores) => {
 	_scores.forEach(e => {
-		scores.value.set(e[0], e[1]);
-		duckdists[ducks.get(e[0])].value = e[1]+'px';
+		user1.value = e[0];
+		user2.value = e[1];
+		user3.value = e[2];
+		user4.value = e[3];
+		let user = e[0];
+		let progress = e[1];
+		scores.value.set(user, progress);
+
+		console.log('user: ' + e[0]);
+		console.log('dist:' + ducks.value.get(user), user, 'scree')
+
+		console.log(d1dist.value);
+		console.log(ducks.value.get(user))
+
+		ducks.value.set(user, progress + 'px');
+		console.log(ducks.value.get(user))
+		cio.emit('progress', getPercentComplete()*2);
+
 	});
 })
 
-cio.on('start', () => {
+cio.on('start', (users) => {
 	console.log('game start!')
+	// console.log(users.length);
+	users.forEach(e => {
+		let duck = duckdists.pop();
+		ducks.value.set(e, duck);
+		console.log(ducks.value.get(e));
+	})
+
 })
 
 cio.on('end', () => {
@@ -100,7 +120,6 @@ cio.on('end', () => {
 })
 
 function sendCount() {
-	percent+=5; //this line is temp
 	cio.emit('progress', percent);
 }
 

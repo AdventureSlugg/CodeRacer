@@ -105,6 +105,7 @@ const updateAccuracy = () => {
 };
 
 const calculateCompletionPercent = () => {
+
 	return solutionCode.value.length ? ((writtenCode.value.length / solutionCode.value.length) * 100).toFixed(2) : 0;
 }
 
@@ -150,7 +151,7 @@ onUnmounted( () => {
 	clearInterval(timerInterval);
 })
 
-defineExpose({ resetGame });
+defineExpose({ resetGame, calculateCompletionPercent });
 </script>
 
 <style scoped>

@@ -28,9 +28,10 @@ let interval = null;
 io.on('connection', (socket) => {
   console.log(socket.id);
   scores.set(socket.id, 0);
-  users.push(socket.id)
-  socket.emit('users', users);
-  socket.broadcast.emit('connected', socket.id);
+  users.push(socket.id);
+  if (users.length >= 4) {
+    users.splice(0,1);
+  }
 
   socket.on('start', () => {
     if (interval) {
@@ -40,11 +41,11 @@ io.on('connection', (socket) => {
         sendScores(socket);
       }, 500);  
       console.log('game started');
-      socket.broadcast.emit('start');
-      socket.emit('start');
+      socket.broadcast.emit('start', users);
+      socket.emit('start', users);
     }
   })
-
+  
   socket.on('end', () => {
     if (interval) {
       clearInterval(interval);
@@ -53,6 +54,7 @@ io.on('connection', (socket) => {
       interval = null;
     }
     else { interval = null; }
+    
   })
 
   socket.on('progress', (percent) => {
@@ -71,6 +73,20 @@ io.on('connection', (socket) => {
   });
 
 })
+
+// io.on('start', () => {
+//   if (interval) {
+//     console.log('game already started');
+//   } else {
+//     interval = setInterval(() => {
+//       sendScores(socket);
+//     }, 500);  
+//     console.log('game started');
+//     io.broadcast.emit('start', users);
+//   }
+// })
+
+
 
 function sendScores(socket) {
   let arrayScores = [];
