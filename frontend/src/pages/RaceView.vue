@@ -128,8 +128,6 @@ const languages = [
 
 .programming-interface {
 	height: 85%; 
-	margin: 1rem; 
-	border-radius: 1rem;
 }
 
 .language {
