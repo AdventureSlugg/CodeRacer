@@ -22,7 +22,7 @@
 				</div>
 				<div class="bottom-section">
 					<div class="programming-interface">
-
+						<textarea></textarea>
 					</div>
 					<div class="difficulty-selection">
 
@@ -124,6 +124,13 @@ const languages = [
 }
 
 .programming-interface {
+
+	textarea {
+		width: 98%;
+		min-height: 400px;
+		height: 100%;
+		background-color: #181720;
+	}
 
 }
 
