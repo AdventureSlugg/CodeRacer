@@ -5,13 +5,13 @@
         :class="{ 'selected': selectedPage == '/practice' }" 
         href="#/practice"
         @click="selectNav('/practice')">
-        Practice
+        PRACTICE
       </a>
       <a class="nav-item" 
         :class="{ 'selected': selectedPage == '/race' }" 
         href="#/race"
         @click="selectNav('/race')">
-        Race
+        RACE
       </a>
     </div>
     <div class="left-nav">
