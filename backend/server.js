@@ -33,12 +33,12 @@ io.on('connection', (socket) => {
   socket.on('wordcount', (count) => {
     console.log(socket.id, count);
     scores.set(socket.id, count);
-    let serializedScores = '';
+    let arrayScores = [];
     scores.forEach((value, key) => {
-      serializedScores += '[' + key + ',' + value + ']';
+      arrayScores.push([key, value])
     });
-    socket.broadcast.emit('scores', serializedScores);
-    socket.emit('scores', serializedScores);
+    socket.broadcast.emit('scores', arrayScores);
+    socket.emit('scores', arrayScores);
 
   })
 

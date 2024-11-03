@@ -55,8 +55,9 @@ cio.on('connect', () => {
 });
 
 cio.on('scores', (_scores) => {
-	scores = _scores;
-	console.log(scores)
+	_scores.forEach(e => {
+		scores.set(e[0], e[1]);
+	});
 })
 
 function sendCount() {
@@ -70,6 +71,8 @@ function sendStartGame() {
 	cio.emit('start');
 	console.log('start!!!');
 }
+
+
 
 const languages = [
 	'Java',
