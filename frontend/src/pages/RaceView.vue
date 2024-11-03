@@ -4,6 +4,7 @@
 			hello
 			<button @click="sendCount">increaes word count</button>
 			<button @click="sendStartGame">Start Game</button>
+			<button @click="sendEndGame">End Game</button>
 			<div class="coding-content">
 				<div class="language-selection">
 					<div class="language" 
@@ -14,6 +15,8 @@
 						</p>
 					</div>
 				</div>
+				{{ scores }}
+				{{ messages }}
 				<div class="bottom-section">
 					<ProgrammingInterface></ProgrammingInterface>
 
@@ -38,11 +41,12 @@ import DifficultySelection from '@/components/DifficultySelection.vue';
 import ProgrammingInterface from '@/components/ProgrammingInterface.vue';
 import SplitContentRace from '@/layouts/SplitContentRace.vue';
 const { io } = require("socket.io-client");
+import { ref } from 'vue';
 
 const cio = io('http://127.0.0.1:3000/');
-let count = 0; // number of words completed
-// let totalWords = 100; // hard coded, oop
-let scores = new Map();
+let percent = 0; // percent of words completed
+let scores = ref(new Map());
+let messages = ref('');
 
 cio.on('connect', () => {
 	console.log('connected!');
@@ -50,24 +54,30 @@ cio.on('connect', () => {
 
 cio.on('scores', (_scores) => {
 	_scores.forEach(e => {
-		scores.set(e[0], e[1]);
+		scores.value.set(e[0], e[1]);
 	});
-	console.log(scores);
+})
+
+cio.on('start', () => {
+	console.log('game start!')
+})
+
+cio.on('end', () => {
+	console.log('game end!')
 })
 
 function sendCount() {
-	count++;
-	cio.emit('wordcount', count);
-	console.log('ahhhhhhhh');
+	percent++; //this line is temp
+	cio.emit('progress', percent);
 }
 
 function sendStartGame() {
-	count++;
 	cio.emit('start');
-	console.log('start!!!');
 }
 
-
+function sendEndGame() {
+	cio.emit('end');
+}
 
 const languages = [
 	'Java',

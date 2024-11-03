@@ -22,24 +22,37 @@ const port = 3000;
 
 const scores = new Map();
 
+let interval = null;
+
 io.on('connection', (socket) => {
   console.log(socket.id);
   scores.set(socket.id, 0);
 
   socket.on('start', () => {
-    // socket.removeAllListeners("scores"); // doesn't work, lol
+    if (interval) {
+      console.log('game already started');
+    } else {
+      interval = setInterval(() => {
+        sendScores(socket);
+      }, 500);  
+      console.log('game started');
+      socket.broadcast.emit('start');
+      socket.emit('start');
+    }
   })
 
-  socket.on('wordcount', (count) => {
-    console.log(socket.id, count);
-    scores.set(socket.id, count);
-    let arrayScores = [];
-    scores.forEach((value, key) => {
-      arrayScores.push([key, value])
-    });
-    socket.broadcast.emit('scores', arrayScores);
-    socket.emit('scores', arrayScores);
+  socket.on('end', () => {
+    if (interval) {
+      clearInterval(interval);
+      socket.broadcast.emit('end');
+      socket.emit('end');
+      interval = null;
+    }
+    else { interval = null; }
+  })
 
+  socket.on('progress', (percent) => {
+    scores.set(socket.id, percent);
   });
 
   socket.on('disconnect', () => {
@@ -48,6 +61,16 @@ io.on('connection', (socket) => {
   });
 
 })
+
+function sendScores(socket) {
+  let arrayScores = [];
+  scores.forEach((value, key) => {
+    arrayScores.push([key, value])
+  });
+
+  socket.broadcast.emit('scores', arrayScores);
+  socket.emit('scores', arrayScores);
+}
 
   // // broadcast every 200 ms. maybe should be out of this connect
   // socket.broadcast.emit('scores', scores);
