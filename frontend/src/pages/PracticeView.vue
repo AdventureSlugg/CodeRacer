@@ -21,9 +21,10 @@
 					</div>
 				</div>
 				<div class="bottom-section">
-					<div class="programming-interface">
-						<textarea></textarea>
-					</div>
+					<ProgrammingInterface>
+						
+					</ProgrammingInterface>
+
 					<div class="difficulty-selection">
 
 					</div>
@@ -37,6 +38,7 @@
 <script setup>
 import { ref } from 'vue';
 import SplitContentFocused from '@/layouts/SplitContentFocused.vue';
+import ProgrammingInterface from '@/components/ProgrammingInterface.vue';
 
 const selectedLesson = ref('0')
 const lessons = [
@@ -94,16 +96,19 @@ const languages = [
 	color:aliceblue;
 	margin-left: 6rem;
 }
+
 .section-header {
 	font-weight: bold;
 	font-size: 24px;
 }
+
 .lesson-item {
 	font-weight: normal;
 	font-size: 20px;
 	color: #C0C0C0;
 	margin-left: 2rem;
 }
+
 .coding-content {
 	background-color: #132629;
 	width: 98%;
@@ -113,25 +118,15 @@ const languages = [
 
 .language-selection {
 	margin-left: 2rem;
+	height: 4rem;
 	display: flex;
 }
 
 .bottom-section {
 	border: solid 2px #00A2BE;
-	height: 10rem;
-	width: 95%;
-	margin: 0rem 2rem
-}
-
-.programming-interface {
-
-	textarea {
-		width: 98%;
-		min-height: 400px;
-		height: 100%;
-		background-color: #181720;
-	}
-
+	height: calc(100% - 6rem);
+	width: calc(100% - 4rem);
+	margin: 0rem 2rem;
 }
 
 .difficulty-selection {
