@@ -38,7 +38,7 @@ onMounted( () => {
 	position: relative;
 	height: 100%;
 	display: flex;
-	background-color: #24202a;
+	background-color: #1F1F1F;
 	table {
 		width: 5rem;
 		color: #C0C0C0;
@@ -58,6 +58,7 @@ onMounted( () => {
 		padding: 8px;
 		font-size: 22px;
 		font-family: 'Courier New', Courier, monospace;
+		border: none
 	}
 
 	textarea:focus {
@@ -67,7 +68,7 @@ onMounted( () => {
 	#solutionCodeOverlay {
 		width: calc(100% - 20px - 5rem);
 		height: calc(100% - 20px);
-		background-color: #181720;
+		background-color: #1F1F1F;
 		color: #4b4b4b;
 		resize: none;
 		z-index: 1;

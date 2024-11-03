@@ -14,7 +14,7 @@
 
 <style scoped>
 .left-menu {
-	width: 30rem;
+	width: 40rem;
 	height: 100%;
 }
 
