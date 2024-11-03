@@ -14,6 +14,7 @@
 				<div class="language-selection">
 					<div class="language" 
 						v-for="language in languages" 
+						:class="{'selected-language': language === selectedLanguage}"
 						:key="language" 
 						@click="selectLanguage(language)">
 						<p>
@@ -156,12 +157,17 @@ const selectLanguage = (language) => {
 	color: #00A2BE;
 	width: 10rem;
 	text-align: center;
-	align-items: center;
 	margin-right: 1rem;
 	margin-top: 1rem;
 	font-size: 20px;
 	height: 3rem;
-	display: flex;
+	border-radius: 1rem 1rem 0rem 0rem;
+}
+
+.selected-language {
+	background-color: #132629;
+	border: solid 2px #00A2BE;
+	border-bottom: 0px;
 }
 
 .selected-item {
