@@ -11,5 +11,4 @@
 
 <script setup>
 import SplitContentFocused from '@/layouts/SplitContentFocused.vue';
-
 </script>

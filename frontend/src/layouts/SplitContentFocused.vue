@@ -16,12 +16,10 @@
 .left-menu {
 	width: 30rem;
 	height: 100%;
-	background-color: aliceblue;
 }
 
 .main-content {
 	height: 100%;
 	width: 100vw;
-	background-color: azure;
 }
 </style>
