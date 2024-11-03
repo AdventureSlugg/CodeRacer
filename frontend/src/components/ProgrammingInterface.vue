@@ -39,10 +39,14 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, defineProps, computed } from 'vue';
+
+const props = defineProps({
+	codingChallenge: String,
+})
 
 const lines = ref([])
-const solutionCode = '// This is the solution\n// is this still working'
+const solutionCode = computed(() => props.codingChallenge)
 const writtenCode = ref('');
 
 // Status
@@ -62,13 +66,13 @@ const updateStats = () => {
 		timerInterval = setInterval(() => {
 			totalTimeInSeconds.value += 1;
 			formatTime();
+			calculateWPM();
 		}, 1000);
 	}
 	updateAccuracy();
-	calculateWPM();
 
 	// Stop the timer when the last character is correct
-	if (writtenCode.value.length >= solutionCode.length && writtenCode.value[writtenCode.value.length - 1] == solutionCode[solutionCode.length - 1]) {
+	if (writtenCode.value.length >= solutionCode.value.length && writtenCode.value[writtenCode.value.length - 1] == solutionCode.value[solutionCode.value.length - 1]) {
 		clearInterval(timerInterval)
 	}
 }
@@ -87,7 +91,7 @@ const updateAccuracy = () => {
 
 	// Calculate incorrect characters
 	for (let i = 0; i < lengthOfWrittenCode; i++) {
-		if (writtenCode.value[i] !== solutionCode[i]) {
+		if (writtenCode.value[i] !== solutionCode.value[i]) {
 			incorrectChars += 1;
 		}
 	}

@@ -3,9 +3,9 @@
 		<template #left-menu>
 			<div class="menu-item" 
 				v-for="lesson in lessons" 
-				:class="{'selected-item': lesson.id == selectedLesson}"
+				:class="{'selected-item': lesson.id == selectedLessonId}"
 				:key="lesson.id">
-				<p :class="lesson.type"> {{ lesson.name }} </p>
+				<p :class="lesson.type" @click="selectSection(lesson.parentId, lesson.id)"> {{ lesson.name }} </p>
 			</div>
 			
 		</template>
@@ -14,14 +14,15 @@
 				<div class="language-selection">
 					<div class="language" 
 						v-for="language in languages" 
-						:key="language">
+						:key="language" 
+						@click="selectLanguage(language)">
 						<p>
 							{{ language }}
 						</p>
 					</div>
 				</div>
 				<div class="bottom-section">
-					<ProgrammingInterface class="programming-interface"></ProgrammingInterface>
+					<ProgrammingInterface class="programming-interface" :codingChallenge="lessonContent"></ProgrammingInterface>
 
 					<DifficultySelection></DifficultySelection>
 				</div>
@@ -36,56 +37,64 @@ import { ref } from 'vue';
 import SplitContentFocused from '@/layouts/SplitContentFocused.vue';
 import ProgrammingInterface from '@/components/ProgrammingInterface.vue';
 import DifficultySelection from '@/components/DifficultySelection.vue';
+import { sections } from '@/data/lessonSections';
 
-const selectedLesson = ref('0')
-const lessons = [
-	{
-		id: '0',
-		name: '0. Overview',
-		type: 'section-header',
-	},
-	{
-		id: '0.0',
-		name: '0.0 Introduction',
-		type: 'lesson-item',
-	},
-	{
-		id: '0.1',
-		name: '0.1 Format',
-		type: 'lesson-item',
-	},
-	{
-		id: '0.2',
-		name: '0.2 About',
-		type: 'lesson-item',
-	},
-	{
-		id: '1',
-		name: '1. Basics',
-		type: 'section-header',
-	},
-	{
-		id: '1.0',
-		name: '0.0 Syntax of the Language',
-		type: 'lesson-item',
-	},
-	{
-		id: '1.1',
-		name: '1.1 Math Operations',
-		type: 'lesson-item',
-	},
-	{
-		id: '1.2',
-		name: '1.2 Functions',
-		type: 'lesson-item',
-	},
-]
+const lessonContent = ref(sections[0].lessons[0].python.content);
 
 const languages = [
 	'Java',
 	'Python',
 	'Javascript'
 ]
+
+const lessons = [];
+const selectedLanguage = ref('Python');
+const selectedLesson = ref(sections[0].lessons[1])
+const selectedLessonId = ref(selectedLesson.value.id)
+
+
+// Set the sections based on the lesson sections
+sections.forEach(section => {
+	lessons.push({
+		id: section.id,
+		name: `${section.id}. ${section.title}`,
+		type: 'section-header',
+	})
+	section.lessons.forEach(lesson => {
+		lessons.push({
+			parentId: section.id,
+			id: lesson.id,
+			name: `${lesson.id} ${lesson.title}`,
+			type: 'lesson-item',
+		})
+	})
+})
+
+const selectSection = (sectionId, lessonId) => {
+	if (sectionId && lessonId) {
+		const sec = sections.find(section => {
+			console.log(section.id == sectionId);
+			return section.id == sectionId
+		})
+
+		const les = sec.lessons.find(lesson => {
+			return lesson.id === lessonId
+		})
+
+		lessonContent.value = selectedLanguage.value == 'Python' ?
+			les.python.content :
+			selectedLanguage.value == 'Java' ? 
+			les.java.content :
+			selectedLanguage.value == 'Javascript' ?
+			les.javascript.content : 'Select a language'
+
+		selectedLessonId.value = lessonId;
+	}
+}
+
+const selectLanguage = (language) => {
+	selectedLanguage.value = language;
+}
 </script>
 
 <style scoped>
@@ -102,7 +111,6 @@ const languages = [
 .lesson-item {
 	font-weight: normal;
 	font-size: 20px;
-	color: #C0C0C0;
 	margin-left: 2rem;
 }
 
@@ -140,6 +148,17 @@ const languages = [
 	margin-top: 1rem;
 	font-size: 20px;
 	height: 3rem;
+	display: flex;
+}
+
+.selected-item {
+	background-color: #C0C0C0;
+	color: #181720;
+	width: 19rem;
+	height: 3rem;
+	border-radius: 1rem;
+	text-align: center;
+	align-items: center;
 	display: flex;
 }
 </style>
