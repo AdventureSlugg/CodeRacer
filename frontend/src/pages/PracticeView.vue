@@ -70,15 +70,26 @@ sections.forEach(section => {
 	})
 })
 
-const selectSection = (sectionId, lessonId) => {
-	if (sectionId && lessonId) {
+const sectionId = ref('0');
+const lessonId = ref('0.0'); 
+
+const selectSection = (sectionIdp, lessonIdp) => {
+	sectionId.value = sectionIdp;
+	lessonId.value = lessonIdp;
+	selectedLessonId.value = lessonId;
+	showSection();
+}
+
+
+const showSection = () => {
+	if (sectionId.value && lessonId.value) {
 		const sec = sections.find(section => {
-			console.log(section.id == sectionId);
-			return section.id == sectionId
+			console.log(section.id == sectionId.value);
+			return section.id == sectionId.value
 		})
 
 		const les = sec.lessons.find(lesson => {
-			return lesson.id === lessonId
+			return lesson.id === lessonId.value
 		})
 
 		lessonContent.value = selectedLanguage.value == 'Python' ?
@@ -88,12 +99,14 @@ const selectSection = (sectionId, lessonId) => {
 			selectedLanguage.value == 'Javascript' ?
 			les.javascript.content : 'Select a language'
 
-		selectedLessonId.value = lessonId;
+		selectedLessonId.value = lessonId.value;
 	}
+	selectedLessonId.value = lessonId.value;
 }
 
 const selectLanguage = (language) => {
 	selectedLanguage.value = language;
+	showSection();
 }
 </script>
 
