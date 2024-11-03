@@ -132,6 +132,9 @@ const resetGame = () => {
 	// stop timer
 	clearInterval(timerInterval);
 
+	// end game
+	hasStarted = false;
+
 	// reset values
 	writtenCode.value = ''
 	wordsPerMinute.value = 0;

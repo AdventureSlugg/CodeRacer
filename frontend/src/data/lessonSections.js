@@ -48,17 +48,17 @@ export const sections = [
 				title: "Racing",
 				python: {
 					content: "\
-# Ahhh this is where the racing description will go\
+# Once you feel ready to compete against other players, checkout the racing tab!\
 					"
 				},
 				java: {
 					content: "\
-// Ahhh this is where the racing description will go\
+// Once you feel ready to compete against other players, checkout the racing tab!\
 					"
 				},
 				javascript: {
 					content: "\
-// Ahhh this is where the racing description will go\
+// Once you feel ready to compete against other players, checkout the racing tab!\
 "
 				}
 			}
