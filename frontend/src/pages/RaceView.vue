@@ -15,12 +15,9 @@
 					</div>
 				</div>
 				<div class="bottom-section">
-					<div class="programming-interface">
+					<ProgrammingInterface></ProgrammingInterface>
 
-					</div>
-					<div class="difficulty-selection">
-
-					</div>
+					<DifficultySelection></DifficultySelection>
 				</div>
 			</div>
 		</template>
@@ -37,6 +34,8 @@
 </template>
 
 <script setup>
+import DifficultySelection from '@/components/DifficultySelection.vue';
+import ProgrammingInterface from '@/components/ProgrammingInterface.vue';
 import SplitContentRace from '@/layouts/SplitContentRace.vue';
 const { io } = require("socket.io-client");
 
@@ -122,17 +121,15 @@ const languages = [
 
 .bottom-section {
 	border: solid 2px #00A2BE;
-	height: 10rem;
-	width: 95%;
-	margin: 0rem 2rem
+	height: calc(100% - 6rem);
+	width: calc(100% - 4rem);
+	margin: 0rem 2rem;
 }
 
 .programming-interface {
-
-}
-
-.difficulty-selection {
-
+	height: 85%; 
+	margin: 1rem; 
+	border-radius: 1rem;
 }
 
 .language {
