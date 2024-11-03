@@ -19,7 +19,6 @@ const lines = ref([])
 const calculateLineCount = () => {
 	const codeContentHeight = document.getElementById("codeContent").offsetHeight - 8;
 	const lineCount = Math.floor(codeContentHeight / 22)
-	console.log(codeContentHeight)
 	lines.value = Array.from({length: lineCount}, (_, i) => i + 1)
 }
 
