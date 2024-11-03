@@ -23,9 +23,15 @@
 					</div>
 				</div>
 				<div class="bottom-section">
-					<ProgrammingInterface class="programming-interface" :codingChallenge="lessonContent"></ProgrammingInterface>
+					<ProgrammingInterface ref="programmingInterfaceRef" class="programming-interface" :codingChallenge="lessonContent"></ProgrammingInterface>
 
-					<DifficultySelection></DifficultySelection>
+					<div style="display: flex;">
+						<DifficultySelection></DifficultySelection>
+						<span style="display:flex; flex-grow: 1; flex-direction: row-reverse;">
+							<button class="reset" @click="resetProgrammingInterface()"> <img src="../assets/Restart.png" alt="Reset" width="40px"> </button>
+						</span>
+					</div>
+					
 				</div>
 				
 			</div>
@@ -39,6 +45,13 @@ import SplitContentFocused from '@/layouts/SplitContentFocused.vue';
 import ProgrammingInterface from '@/components/ProgrammingInterface.vue';
 import DifficultySelection from '@/components/DifficultySelection.vue';
 import { sections } from '@/data/lessonSections';
+
+const programmingInterfaceRef = ref(null);
+const resetProgrammingInterface = () => {
+	if(programmingInterfaceRef.value) {
+		programmingInterfaceRef.value.resetGame();
+	}
+}
 
 const lessonContent = ref(sections[0].lessons[0].python.content);
 
@@ -102,7 +115,7 @@ const showSection = () => {
 		les.javascript.content : 'Select a language'
 
 	selectedLessonId.value = lessonId.value;
-
+	resetProgrammingInterface();
 }
 
 const selectLanguage = (language) => {
@@ -179,5 +192,25 @@ const selectLanguage = (language) => {
 	text-align: center;
 	align-items: center;
 	display: flex;
+}
+
+.reset {
+	width: 4rem;
+	height: 3.5rem;
+	border: none;
+	margin-right: 2rem;
+	font-size: 28px;
+	color: white;
+	background-color: purple;
+	font-weight: bold;
+	border-radius: 1rem;
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.reset:hover {
+	background-color: rgb(131, 64, 131);
+}
+
+.reset:active {
+	background-color: rgb(96, 0, 96);
 }
 </style>

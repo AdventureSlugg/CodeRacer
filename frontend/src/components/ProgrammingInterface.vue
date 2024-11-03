@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref, defineProps, computed } from 'vue';
+import { onMounted, onUnmounted, ref, defineProps, computed, defineExpose } from 'vue';
 
 const props = defineProps({
 	codingChallenge: String,
@@ -127,6 +127,18 @@ const preventBackArrow = (event) => {
 	}
 }
 
+const resetGame = () => {
+	// stop timer
+	clearInterval(timerInterval);
+
+	// reset values
+	writtenCode.value = ''
+	wordsPerMinute.value = 0;
+	timer.value = '00:00';
+	accuracy.value = 0;
+	totalTimeInSeconds.value = 0;
+}
+
 calculateCompletionPercent();
 
 
@@ -137,6 +149,8 @@ onMounted( () => {
 onUnmounted( () => {
 	clearInterval(timerInterval);
 })
+
+defineExpose({ resetGame });
 </script>
 
 <style scoped>
