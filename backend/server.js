@@ -20,6 +20,7 @@ const io = require('socket.io')(server, {
 const hostname = '127.0.0.1';
 const port = 3000;
 
+let users = [];
 const scores = new Map();
 
 let interval = null;
@@ -27,6 +28,9 @@ let interval = null;
 io.on('connection', (socket) => {
   console.log(socket.id);
   scores.set(socket.id, 0);
+  users.push(socket.id)
+  socket.emit('users', users);
+  socket.broadcast.emit('connected', socket.id);
 
   socket.on('start', () => {
     if (interval) {
@@ -58,6 +62,12 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     scores.delete(socket.id);
     console.log(socket.id, 'has disconnected');
+    socket.broadcast.emit('disconnected', socket.id)
+    users.forEach((e, index) => {
+      if (e == socket.id) {
+        users.splice(index, 1);
+      }
+    })
   });
 
 })

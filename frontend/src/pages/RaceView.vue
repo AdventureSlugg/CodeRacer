@@ -27,10 +27,14 @@
 		<template #racetrack>
 			<div class="finish"></div>
 			<div class="tracks">
+				<!-- <div class="track"><img  src="../assets/duck1.png"></div>
 				<div class="track"><img src="../assets/duck1.png"></div>
-				<div class="track"><img src="../assets/duck1.png"></div>
-				<div class="track"><img src="../assets/duck2.png"></div>
-				<div class="track"><img src="../assets/duck1.png"></div>
+				<div class="track"><img  src="../assets/duck2.png"></div>
+				<div class="track"><img  src="../assets/duck1.png"></div> -->
+				<div class="track"><img :style="{bottom: d1dist}" src="../assets/duck1.png"></div>
+				<div class="track"><img :style="{bottom: d2dist}" src="../assets/duck1.png"></div>
+				<div class="track"><img :style="{bottom: d3dist}" src="../assets/duck2.png"></div>
+				<div class="track"><img :style="{bottom: d4dist}" src="../assets/duck1.png"></div>
 			</div>
 		</template>
 	</SplitContentRace>
@@ -48,13 +52,42 @@ let percent = 0; // percent of words completed
 let scores = ref(new Map());
 let messages = ref('');
 
+
+let ducks = new Map();
+let open = [3, 2, 1, 0];
+
+let d1dist = ref('0');
+let d2dist = ref('0');
+let d3dist = ref('0');
+let d4dist = ref('0');
+
+let duckdists = [d1dist, d2dist, d3dist, d4dist];
+
 cio.on('connect', () => {
 	console.log('connected!');
+	ducks.set(cio.id, open.pop());
+
 });
+
+cio.on('users', (users) => {
+	users.forEach(e => {
+		ducks.set(e, open.pop());
+	})
+})
+
+cio.on('connected', (user) => {
+	ducks.set(user, open.pop());
+})
+
+cio.on('disconnected', (user) => {
+	open.push(ducks.get(user));
+	ducks.delete(user);
+})
 
 cio.on('scores', (_scores) => {
 	_scores.forEach(e => {
 		scores.value.set(e[0], e[1]);
+		duckdists[ducks.get(e[0])].value = e[1]+'px';
 	});
 })
 
@@ -67,7 +100,7 @@ cio.on('end', () => {
 })
 
 function sendCount() {
-	percent++; //this line is temp
+	percent+=5; //this line is temp
 	cio.emit('progress', percent);
 }
 
@@ -99,9 +132,14 @@ const languages = [
 	/* height: 100%; */
 	width: 100%;
 	border: #132629 dashed 2px;
+	position: relative;
+	display: flex;
+	justify-content: space-around;
 
 	img {
-		width: 100%;
+		display: block;
+		width: 70px;
+		position: fixed;
 		bottom: 0;
 	}
 }
