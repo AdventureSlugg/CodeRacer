@@ -38,7 +38,8 @@ const selectNav = (selectedNav) => {
 }
 
 const routes = {
-  '/practice': PracticeView, // TODO: Implement
+  '/': PracticeView,
+  '/practice': PracticeView,
   '/race': RaceView, // TODO: Implement
   '/profile': ProfileView // TODO: Implement
 }
