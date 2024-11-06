@@ -143,9 +143,6 @@ const resetGame = () => {
 	totalTimeInSeconds.value = 0;
 }
 
-calculateCompletionPercent();
-
-
 onMounted( () => {
 	generateLineNumbers();
 })
