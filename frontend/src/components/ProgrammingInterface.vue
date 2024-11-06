@@ -177,7 +177,7 @@ defineExpose({ resetGame, calculateCompletionPercent });
 	textarea {
 		width: calc(100% - 20px - 5rem);
 		height: calc(100% - 20px);
-		color: #C0C0C0;
+		color: rgba(0,0,0,0);
 		background: rgba(0,0,0,0);
 		resize: none;
 		z-index: 200;
@@ -187,6 +187,7 @@ defineExpose({ resetGame, calculateCompletionPercent });
 		font-family: 'Courier New', Courier, monospace;
 		border: none;
 		white-space: pre-wrap;
+		caret-color: rgba(255, 255, 255, 1) !important;
 	}
 
 	textarea:focus {
@@ -197,7 +198,7 @@ defineExpose({ resetGame, calculateCompletionPercent });
 		width: calc(100% - 20px - 5rem);
 		height: calc(100% - 20px);
 		background-color: #1F1F1F;
-		color: #4b4b4b;
+		color: #dbdbdb;
 		resize: none;
 		z-index: 100;
 		position: absolute;
@@ -213,7 +214,7 @@ defineExpose({ resetGame, calculateCompletionPercent });
 		resize: none;
 		z-index: 300;
 		position: absolute;
-		padding: 8px;
+		padding: 9px;
 		font-size: 22px;
 		font-family: 'Courier New', Courier, monospace;
 		border: none;
