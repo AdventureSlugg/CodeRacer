@@ -53,7 +53,7 @@ const resetProgrammingInterface = () => {
 	}
 }
 
-const lessonContent = ref(sections[0].lessons[0].python.content);
+const lessonContent = ref(sections[0].lessons[0].java.content);
 
 const languages = [
 	'Java',
@@ -62,8 +62,8 @@ const languages = [
 ]
 
 const lessons = [];
-const selectedLanguage = ref('Python');
-const selectedLesson = ref(sections[0].lessons[1])
+const selectedLanguage = ref('Java');
+const selectedLesson = ref(sections[0].lessons[0])
 const selectedLessonId = ref(selectedLesson.value.id)
 
 
@@ -184,7 +184,7 @@ const selectLanguage = (language) => {
 }
 
 .selected-item {
-	background-color: #C0C0C0;
+	background-color: #ffffff;
 	color: #181720;
 	width: 19rem;
 	height: 3rem;
