@@ -42,7 +42,6 @@ let userSpots = [1, 2, 3, 4];
 let users = [];
 const scores = new Map();
 
-let interval = null;
 
 let gameInProgress = false;
 
@@ -73,42 +72,40 @@ io.use((socket, next) => {
 })
 
 io.on('connection', (socket) => {
-  // scores.set(socket.id, 0);
   socket.emit("session", {
 		sessionID: socket.sessionID,
 		userID: socket.userID,
 	});
   console.log('session id:', socket.sessionID, 'logging in as:', socket.userID)
   console.log('users in room:', users, "\n");
+  scores.set(socket.userID, 0);
 
-
-  // socket.on('start', () => {
-  //   if (interval) {
-  //     console.log('game already started');
-  //   } else {
-  //     interval = setInterval(() => {
-  //       sendScores(socket);
-  //     }, 1000);  
-  //     console.log('game started');
-  //     socket.broadcast.emit('start', users);
-  //     socket.emit('start', users);
-  //   }
-  // })
+  let interval = null;
+  socket.on('start', () => {
+    if (interval) {
+      console.log('game already started');
+    } else {
+      interval = setInterval(() => {
+        sendScores(socket);
+      }, 500);  
+      console.log('game started');
+      socket.broadcast.emit('start', users);
+      socket.emit('start', users);
+    }
+  })
   
-  // socket.on('end', () => {
-  //   if (interval) {
-  //     clearInterval(interval);
-  //     socket.broadcast.emit('end');
-  //     socket.emit('end');
-  //     interval = null;
-  //   }
-  //   else { interval = null; }
-    
-  // })
+  socket.on('end', () => {
+    if (interval) {
+      clearInterval(interval);
+      socket.broadcast.emit('end');
+      socket.emit('end');
+    } 
+    interval = null;
+  })
 
-  // socket.on('progress', (percent) => {
-  //   scores.set(socket.id, percent);
-  // });
+  socket.on('progress', (percent) => {
+    scores.set(socket.userID, percent);
+  });
 
   socket.on("disconnect",  () => {
     // const matchingSockets = await io.in(socket.userID).allSockets();
@@ -134,19 +131,6 @@ io.on('connection', (socket) => {
   });
 
 })
-
-// io.on('start', () => {
-//   if (interval) {
-//     console.log('game already started');
-//   } else {
-//     interval = setInterval(() => {
-//       sendScores(socket);
-//     }, 500);  
-//     console.log('game started');
-//     io.broadcast.emit('start', users);
-//   }
-// })
-
 
 
 function sendScores(socket) {

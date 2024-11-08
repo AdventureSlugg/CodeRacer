@@ -23,11 +23,11 @@
 		</template>
 		<template #racetrack>
 			<div class="finish"></div>
-			<div class="tracks">
-				<div class="track"><img :style="{bottom: duck1}" src="../assets/duck1.png"></div>
-				<div class="track"><img :style="{bottom: duck2}" src="../assets/duck1.png"></div>
-				<div class="track"><img :style="{bottom: duck3}" src="../assets/duck2.png"></div>
-				<div class="track"><img :style="{bottom: duck4}" src="../assets/duck1.png"></div>
+			<div class="tracks" :ref="{track}">
+				<div class="track"><img :style="{bottom: ddist1}" src="../assets/duck1.png"></div>
+				<div class="track"><img :style="{bottom: ddist2}" src="../assets/duck1.png"></div>
+				<div class="track"><img :style="{bottom: ddist3}" src="../assets/duck2.png"></div>
+				<div class="track"><img :style="{bottom: ddist4}" src="../assets/duck1.png"></div>
 			</div>
 		</template>
 	</SplitContentRace>
@@ -38,18 +38,24 @@ import DifficultySelection from '@/components/DifficultySelection.vue';
 import ProgrammingInterface from '@/components/ProgrammingInterface.vue';
 import SplitContentRace from '@/layouts/SplitContentRace.vue';
 const { io } = require("socket.io-client");
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
 const programmingInterfaceRef = ref(null);
 
-// const getPercentComplete = () => {
-// 	if (programmingInterfaceRef.value) {
-// 		return programmingInterfaceRef.value.calculateCompletionPercent();
-// 	}
-	
-// }
+const getPercentComplete = () => {
+	if (programmingInterfaceRef.value) {
+		return programmingInterfaceRef.value.calculateCompletionPercent();
+	}	
+}
 
-// const trackLength =
+let track = ref(null)
+// let trackLength;
+
+onMounted(()=> {
+	// trackLength =  track.value.clientHeight;
+	console.log(track);
+
+})
 
 const socket = io('http://127.0.0.1:3000/');
 // const sessionID = localStorage.getItem("sessionID");
@@ -59,19 +65,16 @@ const socket = io('http://127.0.0.1:3000/');
 //   socket.connect();
 // }
 
-// let percent = 0; // percent of words completed
-// let scores = ref(new Map());
-
 let ducks = new Map()//new Map(); // user, duckdist
 
-let ddist1 = ref('0')
+let ddist1 = ref('0');
 let ddist2 = ref('0');
 let ddist3 = ref('0');
 let ddist4 = ref('0');
 
 let duckdists = [ddist1, ddist2, ddist3, ddist4];
 
-let uid = -1;
+// let uid = -1;
 
 socket.on('connect', () => {
 	console.log('hi');
@@ -84,58 +87,41 @@ socket.on("session", ({ sessionID, userID }) => {
 //   sessionStorage.setItem("sessionID", sessionID);
   // save the ID of the user
   socket.userID = userID;
-  uid = userID;
+//   uid = userID;
 });
 
-
-
-socket.on('assignId', (id) => {
-	uid = id;
-	console.log('I am id:', uid);
-})
-
-
-socket.on('disconnected', (user) => {
+socket.on('user disconnected', (user) => {
 	let duck = ducks.get(user);
 	duckdists.push(duck);
 	ducks.delete(user);
 })
 
-// socket.on('scores', (_scores) => {
-// 	console.log(ducks)
-// 	_scores.forEach(e => {
-// 		let user = e[0];
-// 		let progress = e[1];
-// 		console.log(user, ducks.get(user)[0].value)
-// 		let ddist = ducks.get(user);
-// 		ddist[0].value = progress + 'px';
-// 		// ddist.value = progress + 'px';
-// 		// scores.value.set(user, progress);
+socket.on('scores', (_scores) => {
+	console.log(ducks)
+	_scores.forEach(e => {
+		let user = e[0];
+		let progress = e[1];
+		let ddist = ducks.get(user);
+		console.log('dist:', ddist, 'user:', user, 'progress:', progress)
 
-// 		// ducks.set(user, progress + 'px');
-// 		socket.emit('progress', getPercentComplete()*5);
+		if (ddist) {
+			ddist.value = progress + 'px';
+		}
+		socket.emit('progress', getPercentComplete());
+	});
+})
 
-// 	});
-// })
+socket.on('start', (users) => {
+	console.log('game start!')
+	console.log('users:', users)
+	users.forEach(e => {
+		ducks.set(e, duckdists.pop());
+	})
+})
 
-// socket.on('start', (users) => {
-// 	console.log('game start!')
-// 	users.forEach(e => {
-// 		ducks.set(e, [duckdists.pop()]);
-// 		// let duck = duckdists.pop();
-// 		// ducks.value.set(e, duck);
-// 		// console.log(ducks.value.get(e));
-// 	})
-
-// })
-
-// socket.on('end', () => {
-// 	console.log('game end!')
-// })
-
-// function sendCount() {
-// 	socket.emit('progress', percent);
-// }
+socket.on('end', () => {
+	console.log('game end!')
+})
 
 function sendStartGame() {
 	socket.emit('start');
