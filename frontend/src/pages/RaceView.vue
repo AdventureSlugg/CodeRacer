@@ -1,7 +1,6 @@
 <template>
 	<SplitContentRace>
 		<template #main-content>
-			<button @click="sendCount">increaes word count</button>
 			<button @click="sendStartGame">Start Game</button>
 			<button @click="sendEndGame">End Game</button>
 			<div class="coding-content">
@@ -25,10 +24,10 @@
 		<template #racetrack>
 			<div class="finish"></div>
 			<div class="tracks">
-				<div class="track"><img :style="{bottom: ducks.get(user1)}" src="../assets/duck1.png"></div>
-				<div class="track"><img :style="{bottom: ducks.get(user2)}" src="../assets/duck1.png"></div>
-				<div class="track"><img :style="{bottom: ducks.get(user3)}" src="../assets/duck2.png"></div>
-				<div class="track"><img :style="{bottom: ducks.get(user4)}" src="../assets/duck1.png"></div>
+				<div class="track"><img :style="{bottom: duck1}" src="../assets/duck1.png"></div>
+				<div class="track"><img :style="{bottom: duck2}" src="../assets/duck1.png"></div>
+				<div class="track"><img :style="{bottom: duck3}" src="../assets/duck2.png"></div>
+				<div class="track"><img :style="{bottom: duck4}" src="../assets/duck1.png"></div>
 			</div>
 		</template>
 	</SplitContentRace>
@@ -43,92 +42,107 @@ import { ref } from 'vue';
 
 const programmingInterfaceRef = ref(null);
 
-const getPercentComplete = () => {
-	if (programmingInterfaceRef.value) {
-		return programmingInterfaceRef.value.calculateCompletionPercent();
-	}
+// const getPercentComplete = () => {
+// 	if (programmingInterfaceRef.value) {
+// 		return programmingInterfaceRef.value.calculateCompletionPercent();
+// 	}
 	
-}
+// }
 
 // const trackLength =
 
-const cio = io('http://127.0.0.1:3000/');
-let percent = 0; // percent of words completed
-let scores = ref(new Map());
+const socket = io('http://127.0.0.1:3000/');
+// const sessionID = localStorage.getItem("sessionID");
 
-let ducks = ref(new Map())//new Map(); // user, duckdist
+// if (sessionID) {
+//   socket.auth = { sessionID };
+//   socket.connect();
+// }
 
-let d1dist = ref('0')
-let d2dist = ref('0');
-let d3dist = ref('0');
-let d4dist = ref('0');
+// let percent = 0; // percent of words completed
+// let scores = ref(new Map());
 
-let user1 = ref('');
-let user2 = ref('');
-let user3 = ref('');
-let user4 = ref('');
+let ducks = new Map()//new Map(); // user, duckdist
 
-let duckdists = [d1dist, d2dist, d3dist, d4dist];
+let ddist1 = ref('0')
+let ddist2 = ref('0');
+let ddist3 = ref('0');
+let ddist4 = ref('0');
 
-cio.on('connect', () => {
-	console.log('connected!');
+let duckdists = [ddist1, ddist2, ddist3, ddist4];
+
+let uid = -1;
+
+socket.on('connect', () => {
+	console.log('hi');
+});
+
+socket.on("session", ({ sessionID, userID }) => {
+  // attach the session ID to the next reconnection attempts
+  socket.auth = { sessionID };
+//   // store it in the localstorage (sessionStorage for dev)
+//   sessionStorage.setItem("sessionID", sessionID);
+  // save the ID of the user
+  socket.userID = userID;
+  uid = userID;
 });
 
 
-cio.on('disconnected', (user) => {
-	let duck = ducks.value.get(user);
+
+socket.on('assignId', (id) => {
+	uid = id;
+	console.log('I am id:', uid);
+})
+
+
+socket.on('disconnected', (user) => {
+	let duck = ducks.get(user);
 	duckdists.push(duck);
-	ducks.value.delete(user);
+	ducks.delete(user);
 })
 
-cio.on('scores', (_scores) => {
-	_scores.forEach(e => {
-		user1.value = e[0];
-		user2.value = e[1];
-		user3.value = e[2];
-		user4.value = e[3];
-		let user = e[0];
-		let progress = e[1];
-		scores.value.set(user, progress);
+// socket.on('scores', (_scores) => {
+// 	console.log(ducks)
+// 	_scores.forEach(e => {
+// 		let user = e[0];
+// 		let progress = e[1];
+// 		console.log(user, ducks.get(user)[0].value)
+// 		let ddist = ducks.get(user);
+// 		ddist[0].value = progress + 'px';
+// 		// ddist.value = progress + 'px';
+// 		// scores.value.set(user, progress);
 
-		console.log('user: ' + e[0]);
-		console.log('dist:' + ducks.value.get(user), user, 'scree')
+// 		// ducks.set(user, progress + 'px');
+// 		socket.emit('progress', getPercentComplete()*5);
 
-		console.log(d1dist.value);
-		console.log(ducks.value.get(user))
+// 	});
+// })
 
-		ducks.value.set(user, progress + 'px');
-		console.log(ducks.value.get(user))
-		cio.emit('progress', getPercentComplete()*2);
+// socket.on('start', (users) => {
+// 	console.log('game start!')
+// 	users.forEach(e => {
+// 		ducks.set(e, [duckdists.pop()]);
+// 		// let duck = duckdists.pop();
+// 		// ducks.value.set(e, duck);
+// 		// console.log(ducks.value.get(e));
+// 	})
 
-	});
-})
+// })
 
-cio.on('start', (users) => {
-	console.log('game start!')
-	// console.log(users.length);
-	users.forEach(e => {
-		let duck = duckdists.pop();
-		ducks.value.set(e, duck);
-		console.log(ducks.value.get(e));
-	})
+// socket.on('end', () => {
+// 	console.log('game end!')
+// })
 
-})
-
-cio.on('end', () => {
-	console.log('game end!')
-})
-
-function sendCount() {
-	cio.emit('progress', percent);
-}
+// function sendCount() {
+// 	socket.emit('progress', percent);
+// }
 
 function sendStartGame() {
-	cio.emit('start');
+	socket.emit('start');
 }
 
 function sendEndGame() {
-	cio.emit('end');
+	socket.emit('end');
 }
 
 const languages = [

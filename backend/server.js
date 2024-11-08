@@ -1,4 +1,22 @@
+class SessionStore {
+  constructor() {
+    this.sessions = new Map();
+  }
 
+  findSession(id) {
+    return this.sessions.get(id);
+  }
+
+  saveSession(id, session) {
+    this.sessions.set(id, session);
+  }
+
+  findAllSessions() {
+    return [...this.sessions.values()];
+  }
+}
+
+const sessionStore = new SessionStore();
 
 const server = require('node:http').createServer((req, res) => {
   res.statusCode = 200;
@@ -20,56 +38,99 @@ const io = require('socket.io')(server, {
 const hostname = '127.0.0.1';
 const port = 3000;
 
+let userSpots = [1, 2, 3, 4];
 let users = [];
 const scores = new Map();
 
 let interval = null;
 
-io.on('connection', (socket) => {
-  console.log(socket.id);
-  scores.set(socket.id, 0);
-  users.push(socket.id);
-  if (users.length >= 4) {
-    users.splice(0,1);
-  }
+let gameInProgress = false;
 
-  socket.on('start', () => {
-    if (interval) {
-      console.log('game already started');
-    } else {
-      interval = setInterval(() => {
-        sendScores(socket);
-      }, 500);  
-      console.log('game started');
-      socket.broadcast.emit('start', users);
-      socket.emit('start', users);
-    }
-  })
-  
-  socket.on('end', () => {
-    if (interval) {
-      clearInterval(interval);
-      socket.broadcast.emit('end');
-      socket.emit('end');
-      interval = null;
-    }
-    else { interval = null; }
-    
-  })
+// will have to wipe sessionstore after each game
 
-  socket.on('progress', (percent) => {
-    scores.set(socket.id, percent);
-  });
+io.use((socket, next) => {
+  const sessionID = socket.handshake.auth.sessionID;
+  if (sessionID) {
+    const session = sessionStore.findSession(sessionID);
+    if (session) {
+      socket.sessionID = sessionID;
 
-  socket.on('disconnect', () => {
-    scores.delete(socket.id);
-    console.log(socket.id, 'has disconnected');
-    socket.broadcast.emit('disconnected', socket.id)
-    users.forEach((e, index) => {
-      if (e == socket.id) {
-        users.splice(index, 1);
+      if (gameInProgress) {
+        socket.userID = session.userID;
+      } else {
+        let spot = userSpots.pop();
+        users.push(spot);
+        socket.userID = spot;  
       }
-    })
+      return next();
+    }
+  }
+  socket.sessionID = Math.floor(Math.random()*10000);
+  let spot = userSpots.pop();
+  users.push(spot);
+  socket.userID = spot;
+  next();
+})
+
+io.on('connection', (socket) => {
+  // scores.set(socket.id, 0);
+  socket.emit("session", {
+		sessionID: socket.sessionID,
+		userID: socket.userID,
+	});
+  console.log('session id:', socket.sessionID, 'logging in as:', socket.userID)
+  console.log('users in room:', users, "\n");
+
+
+  // socket.on('start', () => {
+  //   if (interval) {
+  //     console.log('game already started');
+  //   } else {
+  //     interval = setInterval(() => {
+  //       sendScores(socket);
+  //     }, 1000);  
+  //     console.log('game started');
+  //     socket.broadcast.emit('start', users);
+  //     socket.emit('start', users);
+  //   }
+  // })
+  
+  // socket.on('end', () => {
+  //   if (interval) {
+  //     clearInterval(interval);
+  //     socket.broadcast.emit('end');
+  //     socket.emit('end');
+  //     interval = null;
+  //   }
+  //   else { interval = null; }
+    
+  // })
+
+  // socket.on('progress', (percent) => {
+  //   scores.set(socket.id, percent);
+  // });
+
+  socket.on("disconnect",  () => {
+    // const matchingSockets = await io.in(socket.userID).allSockets();
+    // const isDisconnected = matchingSockets.size === 0;
+    // if (isDisconnected) {
+      // scores.delete(socket.id);
+
+      sessionStore.saveSession(socket.sessionID, {
+        userID: socket.userID,
+        connected: false,
+      });
+
+      socket.broadcast.emit('user disconnected', socket.sessionID)
+
+      users.forEach((e, index) => {
+        if (e == socket.userID) {
+          users.splice(index, 1);
+          userSpots.push(e)
+        }
+      })
+      console.log("\n", socket.sessionID, 'has disconnected');
+  // }
   });
 
 })
