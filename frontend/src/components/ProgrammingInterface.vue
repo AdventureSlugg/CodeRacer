@@ -26,10 +26,7 @@
 			<textarea id="codeContent" v-model="writtenCode" @input="updateStats()" @keydown="preventBackArrow"></textarea>
 			<p id="accuracyOverlay">
 				<span v-for="(char, index) in writtenCode" :key="index">
-					<span :class="{
-						'correct': writtenCode[index] === solutionCode[index],
-						'incorrect': writtenCode[index] !== solutionCode[index]
-					}">
+					<span :class="renderMethod(solutionCode[index], writtenCode[index])">
 						{{ solutionCode[index] }}
 					</span>
 				</span>
@@ -59,10 +56,28 @@ let timerInterval;
 let incorrectChars = 0;
 let hasStarted = false;
 
+let renderMethod;
+
 // Update rendering mode of the accuracy based on difficulty
 const updateRender = (difficulty) => {
-	console.log(difficulty);
+	console.log(`Switching to ${difficulty}`);
+	switch(difficulty) {
+		case "easy":
+			renderMethod = easyRender;
+			break;
+		case "default":
+			renderMethod = null;
+	}
 }
+
+const easyRender = (expected, actual) => {
+	if (expected == actual){
+		return "correct";
+	}else{
+		return "incorrect";
+	}
+}
+
 
 const updateStats = () => {
 	if (hasStarted == false) {
@@ -150,6 +165,7 @@ const resetGame = () => {
 
 onMounted( () => {
 	generateLineNumbers();
+	renderMethod = easyRender;
 })
 
 onUnmounted( () => {
