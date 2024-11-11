@@ -26,7 +26,7 @@
 					<ProgrammingInterface ref="programmingInterfaceRef" class="programming-interface" :codingChallenge="lessonContent"></ProgrammingInterface>
 
 					<div style="display: flex;">
-						<DifficultySelection></DifficultySelection>
+						<DifficultySelection :interface="programmingInterfaceRef"></DifficultySelection>
 						<span style="display:flex; flex-grow: 1; flex-direction: row-reverse;">
 							<button class="reset" @click="resetProgrammingInterface()"> <img src="../assets/Restart.png" alt="Reset" width="40px"> </button>
 						</span>

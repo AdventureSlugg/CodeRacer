@@ -13,13 +13,18 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, defineProps } from 'vue';
+
+const props = defineProps({
+	interface: Object
+})
 
 // The difficulty level is set to easy by default
 const difficulty = ref('easy');
 
 const setDifficulty = (selectedDifficulty) => {
 	difficulty.value = selectedDifficulty;
+	props.interface.updateRender(selectedDifficulty);
 }
 
 </script>

@@ -59,6 +59,11 @@ let timerInterval;
 let incorrectChars = 0;
 let hasStarted = false;
 
+// Update rendering mode of the accuracy based on difficulty
+const updateRender = (difficulty) => {
+	console.log(difficulty);
+}
+
 const updateStats = () => {
 	if (hasStarted == false) {
 		hasStarted = true;
@@ -151,7 +156,7 @@ onUnmounted( () => {
 	clearInterval(timerInterval);
 })
 
-defineExpose({ resetGame, calculateCompletionPercent });
+defineExpose({ updateRender, resetGame, calculateCompletionPercent });
 </script>
 
 <style scoped>
