@@ -23,7 +23,7 @@
 
 		<div>
 			<p id="solutionCodeOverlay"> {{ solutionCode }} </p>
-			<textarea id="codeContent" v-model="writtenCode" @input="updateStats()" @keydown="preventBackArrow"></textarea>
+			<textarea id="codeContent" v-model="writtenCode" @input="updateStats()" @keydown="processInput"></textarea>
 			<p id="accuracyOverlay">
 				<span v-for="(char, index) in writtenCode" :key="index">
 					<span :class="renderMethod(solutionCode[index], writtenCode[index])">
@@ -45,6 +45,7 @@ const props = defineProps({
 const lines = ref([])
 const solutionCode = computed(() => props.codingChallenge)
 const writtenCode = ref('');
+let solutionCodeIndex = 0; // tracking current character of solutionCode
 
 // Status
 const wordsPerMinute = ref(0);
@@ -78,6 +79,48 @@ const easyRender = (expected, actual) => {
 	}
 }
 
+const processInput = (event) => {
+
+	let expectedChar = solutionCode.value[solutionCodeIndex];
+
+	// Priority:
+	// 1 - Backspace
+	// 2 - Enter
+	// 3 - Other keys
+	
+	// Special case:
+	// - newline/non-enter
+	// - non-alpha or non-symbol keys
+	switch(event.key){
+		case 'Backspace': {
+			if (solutionCodeIndex > 0){
+				solutionCodeIndex--;
+			}
+			break;
+		}
+		case 'Enter': {
+			if (expectedChar != '\n'){
+				event.preventDefault();
+			}else{
+				solutionCodeIndex++;
+			}
+			break;
+		}
+		default: {
+			if (event.key.length != 1 || expectedChar == '\n'){
+				// Any key that is not alphanumeric or symbol (e.g. 'Ctrl')
+				// OR the next character is a newline but Enter was not pressed
+				// should not add to the textbox.
+				event.preventDefault();
+			}else{
+				solutionCodeIndex++;
+			}
+			break;
+		}
+
+	}
+
+}
 
 const updateStats = () => {
 	if (hasStarted == false) {
@@ -140,12 +183,6 @@ const generateLineNumbers = () => {
 	const codeContentHeight = document.getElementById("codeContent").offsetHeight - 8;
 	const lineCount = Math.floor(codeContentHeight / 22)
 	lines.value = Array.from({length: lineCount}, (_, i) => i + 1)
-}
-
-const preventBackArrow = (event) => {
-	if (event.key === 'ArrowLeft') {
-		event.preventDefault();
-	}
 }
 
 const resetGame = () => {
