@@ -22,15 +22,12 @@
 		</table>
 
 		<div>
-			<p id="solutionCodeOverlay"> {{ solutionCode }} </p>
-			<textarea id="codeContent" v-model="writtenCode" @input="updateStats()" @keydown="preventBackArrow"></textarea>
+			<p id="solutionCodeOverlay" :style="{ visibility: isVisibleSolution ? 'visible' : 'hidden'}"> {{ solutionCode }} </p>
+			<textarea id="codeContent" v-model="writtenCode" @input="updateStats()" @keydown="processInput"></textarea>
 			<p id="accuracyOverlay">
 				<span v-for="(char, index) in writtenCode" :key="index">
-					<span :class="{
-						'correct': writtenCode[index] === solutionCode[index],
-						'incorrect': writtenCode[index] !== solutionCode[index]
-					}">
-						{{ solutionCode[index] }}
+					<span :class="renderMethod(solutionCode[index], writtenCode[index])">
+						{{ visibleCode[index] }}
 					</span>
 				</span>
 			</p>
@@ -48,6 +45,7 @@ const props = defineProps({
 const lines = ref([])
 const solutionCode = computed(() => props.codingChallenge)
 const writtenCode = ref('');
+let solutionCodeIndex = 0; // tracking current character of solutionCode
 
 // Status
 const wordsPerMinute = ref(0);
@@ -58,6 +56,107 @@ const totalTimeInSeconds = ref(0);
 let timerInterval;
 let incorrectChars = 0;
 let hasStarted = false;
+
+let renderMethod; // onMounted, set to Easy mode
+let visibleCode; // onMounted, set to solution code
+let isVisibleSolution; // onMounted, set to true
+
+// Update rendering mode of the accuracy based on difficulty
+const updateRender = (difficulty) => {
+	console.log(`Switching to ${difficulty}`);
+	switch(difficulty) {
+		case "easy":
+			isVisibleSolution = true;
+			visibleCode = solutionCode;
+			renderMethod = easyRender;
+			break;
+		case "medium":
+			isVisibleSolution = false;
+			visibleCode = writtenCode;
+			renderMethod = mediumRender;
+			break;
+		case "hard":
+			isVisibleSolution = false;
+			visibleCode = writtenCode;
+			renderMethod = hardRender;
+			break;
+
+		case "default":
+			renderMethod = null;
+	}
+}
+
+const easyRender = (expected, actual) => {
+	if (expected == actual){
+		return "correct";
+	}else{
+		return "incorrect";
+	}
+}
+
+// eslint-disable-next-line
+const mediumRender = (expected, actual) => {
+	if (expected == actual){
+		visibleCode = writtenCode;
+		return "correct";
+	}else{
+		visibleCode = solutionCode;
+		return "incorrect";
+	}
+}
+
+// eslint-disable-next-line
+const hardRender = (expected, actual) => {
+	return "neutral";
+}
+
+const processInput = (event) => {
+
+	// Free type for hard render
+	if (renderMethod == hardRender){
+		return;
+	}
+
+	let expectedChar = solutionCode.value[solutionCodeIndex];
+
+	// Priority:
+	// 1 - Backspace
+	// 2 - Enter
+	// 3 - Other keys
+	
+	// Special case:
+	// - newline/non-enter
+	// - non-alpha or non-symbol keys
+	switch(event.key){
+		case 'Backspace': {
+			if (solutionCodeIndex > 0){
+				solutionCodeIndex--;
+			}
+			break;
+		}
+		case 'Enter': {
+			if (expectedChar != '\n'){
+				event.preventDefault();
+			}else{
+				solutionCodeIndex++;
+			}
+			break;
+		}
+		default: {
+			if (event.key.length != 1 || expectedChar == '\n'){
+				// Any key that is not alphanumeric or symbol (e.g. 'Ctrl')
+				// OR the next character is a newline but Enter was not pressed
+				// should not add to the textbox.
+				event.preventDefault();
+			}else{
+				solutionCodeIndex++;
+			}
+			break;
+		}
+
+	}
+
+}
 
 const updateStats = () => {
 	if (hasStarted == false) {
@@ -122,12 +221,6 @@ const generateLineNumbers = () => {
 	lines.value = Array.from({length: lineCount}, (_, i) => i + 1)
 }
 
-const preventBackArrow = (event) => {
-	if (event.key === 'ArrowLeft') {
-		event.preventDefault();
-	}
-}
-
 const resetGame = () => {
 	// stop timer
 	clearInterval(timerInterval);
@@ -145,13 +238,16 @@ const resetGame = () => {
 
 onMounted( () => {
 	generateLineNumbers();
+	renderMethod = easyRender;
+	visibleCode = solutionCode;
+	isVisibleSolution = true;
 })
 
 onUnmounted( () => {
 	clearInterval(timerInterval);
 })
 
-defineExpose({ resetGame, calculateCompletionPercent });
+defineExpose({ updateRender, resetGame, calculateCompletionPercent });
 </script>
 
 <style scoped>
@@ -225,6 +321,10 @@ defineExpose({ resetGame, calculateCompletionPercent });
 
 	.incorrect {
 		color: #aa2f2f;
+	}
+
+	.neutral {
+		color: white;
 	}
 
 	p {
