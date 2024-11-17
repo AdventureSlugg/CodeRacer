@@ -22,12 +22,12 @@
 		</table>
 
 		<div>
-			<p id="solutionCodeOverlay"> {{ solutionCode }} </p>
+			<p id="solutionCodeOverlay" :style="{ visibility: isVisibleSolution ? 'visible' : 'hidden'}"> {{ solutionCode }} </p>
 			<textarea id="codeContent" v-model="writtenCode" @input="updateStats()" @keydown="processInput"></textarea>
 			<p id="accuracyOverlay">
 				<span v-for="(char, index) in writtenCode" :key="index">
 					<span :class="renderMethod(solutionCode[index], writtenCode[index])">
-						{{ solutionCode[index] }}
+						{{ visibleCode[index] }}
 					</span>
 				</span>
 			</p>
@@ -57,15 +57,30 @@ let timerInterval;
 let incorrectChars = 0;
 let hasStarted = false;
 
-let renderMethod;
+let renderMethod; // onMounted, set to Easy mode
+let visibleCode; // onMounted, set to solution code
+let isVisibleSolution; // onMounted, set to true
 
 // Update rendering mode of the accuracy based on difficulty
 const updateRender = (difficulty) => {
 	console.log(`Switching to ${difficulty}`);
 	switch(difficulty) {
 		case "easy":
+			isVisibleSolution = true;
+			visibleCode = solutionCode;
 			renderMethod = easyRender;
 			break;
+		case "medium":
+			isVisibleSolution = false;
+			visibleCode = writtenCode;
+			renderMethod = mediumRender;
+			break;
+		case "hard":
+			isVisibleSolution = false;
+			visibleCode = writtenCode;
+			renderMethod = hardRender;
+			break;
+
 		case "default":
 			renderMethod = null;
 	}
@@ -79,7 +94,28 @@ const easyRender = (expected, actual) => {
 	}
 }
 
+// eslint-disable-next-line
+const mediumRender = (expected, actual) => {
+	if (expected == actual){
+		visibleCode = writtenCode;
+		return "correct";
+	}else{
+		visibleCode = solutionCode;
+		return "incorrect";
+	}
+}
+
+// eslint-disable-next-line
+const hardRender = (expected, actual) => {
+	return "neutral";
+}
+
 const processInput = (event) => {
+
+	// Free type for hard render
+	if (renderMethod == hardRender){
+		return;
+	}
 
 	let expectedChar = solutionCode.value[solutionCodeIndex];
 
@@ -203,6 +239,8 @@ const resetGame = () => {
 onMounted( () => {
 	generateLineNumbers();
 	renderMethod = easyRender;
+	visibleCode = solutionCode;
+	isVisibleSolution = true;
 })
 
 onUnmounted( () => {
@@ -283,6 +321,10 @@ defineExpose({ updateRender, resetGame, calculateCompletionPercent });
 
 	.incorrect {
 		color: #aa2f2f;
+	}
+
+	.neutral {
+		color: white;
 	}
 
 	p {
