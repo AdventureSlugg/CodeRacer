@@ -24,6 +24,7 @@ const difficulty = ref('easy');
 
 const setDifficulty = (selectedDifficulty) => {
 	difficulty.value = selectedDifficulty;
+	props.interface.resetGame();
 	props.interface.updateRender(selectedDifficulty);
 }
 
